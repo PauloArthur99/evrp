@@ -22,9 +22,6 @@ int main(){
     vector<pair<double, double>> points;
     vector<double> demands;
 
-    //matriz de distancias.
-    vector<vector<double>> distMatrix;
-
     ifstream MyReadFile("c101_21.txt");
     // Pulando a linha de cabeçalho.
     getline(MyReadFile, myText);
@@ -56,6 +53,11 @@ int main(){
         }
     }
     MyReadFile.close();
+
+    int sizePoints = points.size();
+
+    //matriz de distancias.
+    vector<vector<double>> distMatrix(sizePoints, vector<double>(sizePoints, 0.0) );
 
     // Preenchimento da matriz de distâncias.
     for (int i = 0; i < points.size(); i++)
