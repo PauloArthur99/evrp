@@ -6,6 +6,7 @@
 #include <string>
 #include <cmath>
 using namespace std;
+#define ENERGY_CONST 275795.1416
 
 // Retorna a distancia euclidiana de dois pontos estruturados como pares.
 double distancePoints(pair<double, double> a, pair<double, double> b){
@@ -57,7 +58,8 @@ int main(){
     int sizePoints = points.size();
 
     //matriz de distancias.
-    vector<vector<double>> distMatrix(sizePoints, vector<double>(sizePoints, 0.0) );
+    vector<vector<double>> distMatrix(sizePoints, vector<double>(sizePoints, 0.0));
+    vector<vector<double>> energyMatrix(sizePoints, vector<double>(sizePoints, 0.0));
 
     // Preenchimento da matriz de distâncias.
     for (int i = 0; i < points.size(); i++)
@@ -65,6 +67,7 @@ int main(){
         for (int j = 0; j < points.size(); j++)
         {
             distMatrix[i][j] = distancePoints(points[i], points[j]);
+            energyMatrix[i][j] = ENERGY_CONST * distMatrix[i][j];
         }
     }
 	return 0;
