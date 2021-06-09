@@ -67,9 +67,7 @@ int main(){
         {
         }
         else
-        {
             break;
-        }
     }
     MyReadFile.close();
 
@@ -103,6 +101,38 @@ int main(){
             if (savingIJ > 0)
                 savingQueue.push(savingStruct);
         }
+    }
+
+    // Coleção de rotas
+    vector<vector<int>> routes;
+    for (int i = 1; i <= lastPoint; i++)
+    {
+        vector<int> aux{i};
+        routes.push_back(aux);
+    }
+
+    while (!savingQueue.empty())
+    {
+        int pointA, idxA, pointB, idxB;
+        pointA = savingQueue.top().pointA;
+        pointB = savingQueue.top().pointB;
+        savingQueue.pop();
+        
+        for (int i = 0; i < routes.size(); i++)
+        {
+            for (int j = 0; i < routes[i].size(); i++)
+            {
+                if (routes[i][j] == pointA)
+                {
+                    idxA = i;
+                }
+                else if(routes[i][j] == pointB)
+                {
+                    idxB = i;
+                }
+            }
+        }
+        // TO DO
     }
 
 	return 0;
