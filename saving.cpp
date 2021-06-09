@@ -63,6 +63,9 @@ int main(){
                 demands.push_back(stod(pointDemand));
             }
         }
+        else if (type == "f")
+        {
+        }
         else
         {
             break;
@@ -78,9 +81,9 @@ int main(){
     vector<vector<double>> energyMatrix(sizePoints, vector<double>(sizePoints, 0.0));
 
     // Preenchimento da matriz de distâncias e de energias.
-    for (int i = 0; i < points.size(); i++)
+    for (int i = 0; i < sizePoints; i++)
     {
-        for (int j = 0; j < points.size(); j++)
+        for (int j = 0; j < sizePoints; j++)
         {
             distMatrix[i][j] = distancePoints(points[i], points[j]);
             energyMatrix[i][j] = ENERGY_CONST * distMatrix[i][j];
@@ -93,10 +96,22 @@ int main(){
         for (int j = i + 1; j <= lastPoint; j++)
         {
             double savingIJ = distMatrix[0][i] + distMatrix[0][j] - distMatrix[i][j];
-            struct saving savingStruct = {i, j, savingIJ};
+            struct saving savingStruct;
+            savingStruct.pointA = i;
+            savingStruct.pointB = j;
+            savingStruct.saving = savingIJ;
             savingQueue.push(savingStruct);
         }
     }
+    cout << savingQueue.top().saving;
+    savingQueue.pop();
+    cout << savingQueue.top().saving;
+    cout << savingQueue.top().saving;
+    savingQueue.pop();
+    cout << savingQueue.top().saving;
+    cout << savingQueue.top().saving;
+    savingQueue.pop();
+    cout << savingQueue.top().saving;
     cout << savingQueue.top().saving;
     savingQueue.pop();
     cout << savingQueue.top().saving;
