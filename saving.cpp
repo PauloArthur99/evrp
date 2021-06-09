@@ -27,7 +27,7 @@ struct saving
 
 bool operator< (const saving sav1, const saving sav2)
 {
-	return sav1.saving > sav2.saving;	
+	return sav1.saving < sav2.saving;	
 }
 
 int main(){
@@ -89,7 +89,7 @@ int main(){
             energyMatrix[i][j] = ENERGY_CONST * distMatrix[i][j];
         }
     }
-
+    
     // Cálculo das economias das arestas
     for (int i = 1; i < lastPoint; i++)
     {
@@ -100,18 +100,10 @@ int main(){
             savingStruct.pointA = i;
             savingStruct.pointB = j;
             savingStruct.saving = savingIJ;
-            savingQueue.push(savingStruct);
+            if (savingIJ > 0)
+                savingQueue.push(savingStruct);
         }
     }
-    cout << savingQueue.top().saving;
-    savingQueue.pop();
-    cout << savingQueue.top().saving;
-    savingQueue.pop();
-    cout << savingQueue.top().saving;
-    savingQueue.pop();
-    cout << savingQueue.top().saving;
-    savingQueue.pop();
-    cout << savingQueue.top().saving;
 
 	return 0;
 }
