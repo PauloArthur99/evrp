@@ -106,12 +106,9 @@ int main(){
     cout << savingQueue.top().saving;
     savingQueue.pop();
     cout << savingQueue.top().saving;
-    cout << savingQueue.top().saving;
     savingQueue.pop();
     cout << savingQueue.top().saving;
-    cout << savingQueue.top().saving;
     savingQueue.pop();
-    cout << savingQueue.top().saving;
     cout << savingQueue.top().saving;
     savingQueue.pop();
     cout << savingQueue.top().saving;
