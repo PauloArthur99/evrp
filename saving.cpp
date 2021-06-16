@@ -6,16 +6,80 @@
 #include <string>
 #include <cmath>
 #include <queue>
+#include <algorithm>
 using namespace std;
 #define ENERGY_CONST 275795.1416
 
 // Retorna a distancia euclidiana de dois pontos estruturados como pairs.
-double distancePoints(pair<double, double> a, pair<double, double> b){
+double distancePoints(pair<double, double> a, pair<double, double> b)
+{
     double pot1, pot2;
-
     pot1 = pow((b.first - a.first), 2);
     pot2 = pow((b.second - a.second), 2);
     return sqrt(pot1 + pot2);
+}
+
+vector<int> joinTwoRoutes(vector<int> vectA, int elemA, vector<int> vectB, int elemB)
+{
+    bool firstA, firstB;
+    if (vectA[0] = elemA)
+    {
+        firstA = true;
+    }
+    else
+    {
+        firstA = false;
+    }
+    if (vectB[0] = elemB)
+    {
+        firstB = true;
+    }
+    else
+    {
+        firstB = false;
+    }
+
+    if (firstA == firstB && vectA.size() > 1 && vectB.size() > 1)
+    {
+        if (vectA.size() < vectB.size())
+        {
+            reverse(vectA.begin(), vectA.end());
+        }
+        else
+        {
+            reverse(vectB.begin(), vectB.end());
+        }
+    }
+
+    vector<int> v;
+    if(vectA.back() == elemA && vectB[0] == elemB)
+    {
+        v.insert(v.end(), vectA.begin(), vectA.end());
+        v.insert(v.end(), vectB.begin(), vectB.end());
+    }
+    else
+    {
+        v.insert(v.end(), vectB.begin(), vectB.end());
+        v.insert(v.end(), vectA.begin(), vectA.end());
+    }
+    return v;
+}
+
+bool depositConect(vector<int> route, int point)
+{
+    if (route[0] == point)
+    {
+        return true;
+    }
+    else if (route.back() == point)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+    
 }
 
 // Struct utilizada para descrever as economias
@@ -67,7 +131,9 @@ int main(){
         {
         }
         else
+        {
             break;
+        }
     }
     MyReadFile.close();
 
@@ -132,7 +198,27 @@ int main(){
                 }
             }
         }
-        // TO DO
+        if (routes[idxA] != routes[idxB])
+        {
+            if (depositConect(routes[idxA], pointA), depositConect(routes[idxB], pointB))
+            {
+                // if (capacidade)
+                vector<int> routesJoined = joinTwoRoutes(routes[idxA], pointA, routes[idxB], pointB);
+                routes.push_back(routesJoined);
+
+                if (idxA < idxB)
+                {
+                    routes.erase(routes.begin() + idxA);
+                    routes.erase(routes.begin() + idxB - 1);
+                }
+                else
+                {
+                    routes.erase(routes.begin() + idxA);
+                    routes.erase(routes.begin() + idxB);
+                }
+            }
+        }     
+    
     }
 
 	return 0;
