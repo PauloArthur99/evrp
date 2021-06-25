@@ -19,6 +19,30 @@ double distancePoints(pair<double, double> a, pair<double, double> b)
     return sqrt(pot1 + pot2);
 }
 
+// escreve as coordenadas dos pontos num arquivo
+void writePoints(vector<pair<double,double>> points , string fileName)
+{
+    ofstream MyFile(fileName); 
+    MyFile << "PointID    Coordenadas\n";
+
+    for (int i = 0; i < points.size(); i ++)
+    {
+        if (i < 10)
+        {
+            MyFile << i << "          " << points[i].first << " " << points[i].second; 
+        }
+        else if (i >= 100)
+        {
+            MyFile << i << "        " << points[i].first << " " << points[i].second;
+        }
+        else
+        {
+            MyFile << i << "         " << points[i].first << " " << points[i].second;
+        }
+        MyFile << "\n";
+    }
+}
+
 // escreve as rotas encontradas em um arquivo
 void writeSolution(vector<vector<int>> routes, string fileName)
 {

@@ -44,6 +44,8 @@ int main(){
     }
     MyReadFile.close();
 
+    writePoints(points, "PointCoord.txt");
+
     int sizePoints = points.size();
     int lastPoint = sizePoints - 1;
 
