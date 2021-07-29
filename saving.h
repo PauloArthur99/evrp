@@ -8,7 +8,7 @@
 #include <queue>
 #include <algorithm>
 using namespace std;
-#define ENERGY_CONST 275795.1416
+#define ENERGY_CONST_LOAD 0.129285172
 
 // Retorna a distancia euclidiana de dois pontos estruturados como pairs.
 double distancePoints(pair<double, double> a, pair<double, double> b)
@@ -44,10 +44,10 @@ void writePoints(vector<pair<double,double>> points , string fileName)
 }
 
 // escreve as rotas encontradas em um arquivo
-void writeSolution(vector<vector<int>> routes, string fileName)
+void writeSolution(vector<vector<int>> routes, vector<double> routesEnergy, string fileName)
 {
     ofstream MyFile(fileName); 
-    MyFile << "RouteID    RoutePoints\n";
+    MyFile << "RouteID    RoutePoints           Energy\n";
 
     for (int i = 0; i < routes.size(); i++)
     {
@@ -63,7 +63,7 @@ void writeSolution(vector<vector<int>> routes, string fileName)
         {
             MyFile << routes[i][j] << " ";
         }
-        MyFile << "\n";
+        MyFile << "    " << routesEnergy[i] << "\n";
     }
 }
 

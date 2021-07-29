@@ -1,7 +1,8 @@
 #include "saving.h"
+#define ENERGY_CONST 86.20810869
 using namespace std;
 
-int main(){
+int main(int argc, char** argv){
     string myText;
 
     vector<pair<double, double>> points;
@@ -10,7 +11,7 @@ int main(){
 
     priority_queue<saving> savingQueue;
 
-    ifstream MyReadFile("c101_21.txt");
+    ifstream MyReadFile(argv[1]);
     // Pulando a linha de cabeçalho.
     getline(MyReadFile, myText);
     
@@ -44,7 +45,7 @@ int main(){
     }
     MyReadFile.close();
 
-    writePoints(points, "PointCoord.txt");
+    //writePoints(points, "PointCoord.txt");
 
     int sizePoints = points.size();
     int lastPoint = sizePoints - 1;
@@ -142,7 +143,43 @@ int main(){
             }
         }     
     }
-    writeSolution(routes, "arquivoSoluções.txt");
+    //writeSolution(routes, "arquivoSoluções.txt");
+
+
+    vector<double> routesEnergy;
+    for (int i = 0; i < routes.size(); i++)
+    {
+        double customerDemand = 0;
+        double energySum = 0;
+        for (int j = 0; j < routes[i].size(); j++)
+        {
+            int customer = routes[i][j];
+            customerDemand += demands[customer];
+        }
+
+        routes[i].insert(routes[i].begin(), 0);
+        routes[i].push_back(0);
+
+        for (int j = 0; j < routes[i].size()-1; j++)
+        {
+            int orig = routes[i][j];
+            int dest = routes[i][j+1];
+            energySum += energyMatrix[orig][dest];
+            energySum += distMatrix[orig][dest] * customerDemand * ENERGY_CONST_LOAD;
+            customerDemand -= demands[dest];
+        }
+        routesEnergy.push_back(energySum);
+    }
+/*
+    for (int i = 0; i < routesEnergy.size(); i++)
+    {
+        cout << routesEnergy[i] << "\n";
+    }
+*/
+    string strSolucao = "/Users/paulo/Desktop/evrp/evrptw_instances/soluções/solução";
+    strSolucao = strSolucao + argv[1];
+    
+    writeSolution(routes, routesEnergy, strSolucao);
 
 	return 0;
 }

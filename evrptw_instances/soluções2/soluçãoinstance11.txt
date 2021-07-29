@@ -1,0 +1,2 @@
+RouteID    RoutePoints           Energy
+R1         0 7 6 15 8 9 1 10 5 11 13 14 2 3 12 4 0     46246
