@@ -126,19 +126,60 @@ int main(int argc, char** argv){
 
                 if (demandSum <= loadCapacity)
                 {
-                    vector<int> routesJoined = joinTwoRoutes(routes[idxA], pointA, routes[idxB], pointB);
-                    routes.push_back(routesJoined);
+                    double routeEnergy = 0;
+                    vector<int> route_copied;
+                    route_copied = routes[idxA];
+                    if (routes[idxA][0] == pointA)
+                    {
+                        reverse(route_copied.begin(), route_copied.end());
+                    }
+                    int dest = route_copied[0];
+                    routeEnergy += energyMatrix[0][dest];
+                    routeEnergy += distMatrix[0][dest] * demandSum * ENERGY_CONST_LOAD;
+                    demandSum -= demands[dest];
+                    for (int i = 0; i < route_copied.size() - 1; i++)
+                    {
+                        int orig = route_copied[i];
+                        int dest = route_copied[i+1];
+                        routeEnergy += energyMatrix[orig][dest];
+                        routeEnergy += distMatrix[orig][dest] * demandSum * ENERGY_CONST_LOAD;
+                        demandSum -= demands[dest];
+                    }
+                    routeEnergy += energyMatrix[pointA][pointB];
+                    routeEnergy += distMatrix[pointA][pointB] * demandSum * ENERGY_CONST_LOAD;
+                    demandSum -= demands[pointB];
 
-                    if (idxA < idxB)
+                    vector<int> route_copied_B;
+                    route_copied_B = routes[idxB];
+                    if (routes[idxB][0] != pointB)
                     {
-                        routes.erase(routes.begin() + idxA);
-                        routes.erase(routes.begin() + idxB - 1);
+                        reverse(route_copied_B.begin(), route_copied_B.end());
                     }
-                    else
+                    for (int i = 0; i < route_copied_B.size() - 1; i++)
                     {
-                        routes.erase(routes.begin() + idxA);
-                        routes.erase(routes.begin() + idxB);
+                        int orig = route_copied_B[i];
+                        int dest = route_copied_B[i+1];
+                        routeEnergy += energyMatrix[orig][dest];
+                        routeEnergy += distMatrix[orig][dest] * demandSum * ENERGY_CONST_LOAD;
+                        demandSum -= demands[dest];
                     }
+                    routeEnergy += energyMatrix[dest][0];
+                    if (routeEnergy <= 18000)
+                    {
+                        vector<int> routesJoined = joinTwoRoutes(routes[idxA], pointA, routes[idxB], pointB);
+                        routes.push_back(routesJoined);
+
+                        if (idxA < idxB)
+                        {
+                            routes.erase(routes.begin() + idxA);
+                            routes.erase(routes.begin() + idxB - 1);
+                        }
+                        else
+                        {
+                            routes.erase(routes.begin() + idxA);
+                            routes.erase(routes.begin() + idxB);
+                        }
+                    }                    
                 }
             }
         }     
