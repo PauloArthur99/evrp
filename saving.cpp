@@ -125,46 +125,14 @@ int main(int argc, char** argv){
                 } 
 
                 if (demandSum <= loadCapacity)
-                {
-                    double routeEnergy = 0;
-                    vector<int> route_copied;
-                    route_copied = routes[idxA];
-                    if (routes[idxA][0] == pointA)
-                    {
-                        reverse(route_copied.begin(), route_copied.end());
-                    }
-                    int dest = route_copied[0];
-                    routeEnergy += energyMatrix[0][dest];
-                    routeEnergy += distMatrix[0][dest] * demandSum * ENERGY_CONST_LOAD;
-                    demandSum -= demands[dest];
-                    for (int i = 0; i < route_copied.size() - 1; i++)
-                    {
-                        int orig = route_copied[i];
-                        int dest = route_copied[i+1];
-                        routeEnergy += energyMatrix[orig][dest];
-                        routeEnergy += distMatrix[orig][dest] * demandSum * ENERGY_CONST_LOAD;
-                        demandSum -= demands[dest];
-                    }
-                    routeEnergy += energyMatrix[pointA][pointB];
-                    routeEnergy += distMatrix[pointA][pointB] * demandSum * ENERGY_CONST_LOAD;
-                    demandSum -= demands[pointB];
+                {   
+                    double spentEnergy = requiredEnergy(distMatrix, energyMatrix, 
+                    demands, routes[idxA], routes[idxB], demandSum, pointA, pointB);
 
-                    vector<int> route_copied_B;
-                    route_copied_B = routes[idxB];
-                    if (routes[idxB][0] != pointB)
-                    {
-                        reverse(route_copied_B.begin(), route_copied_B.end());
-                    }
-                    for (int i = 0; i < route_copied_B.size() - 1; i++)
-                    {
-                        int orig = route_copied_B[i];
-                        int dest = route_copied_B[i+1];
-                        routeEnergy += energyMatrix[orig][dest];
-                        routeEnergy += distMatrix[orig][dest] * demandSum * ENERGY_CONST_LOAD;
-                        demandSum -= demands[dest];
-                    }
-                    routeEnergy += energyMatrix[dest][0];
-                    if (routeEnergy <= 18000)
+                    double spentEnergyReverse = requiredEnergy(distMatrix, energyMatrix, 
+                    demands, routes[idxB], routes[idxA], demandSum, pointB, pointA);
+
+                    if (spentEnergy <= 18000 && spentEnergyReverse <= 18000)
                     {
                         vector<int> routesJoined = joinTwoRoutes(routes[idxA], pointA, routes[idxB], pointB);
                         routes.push_back(routesJoined);

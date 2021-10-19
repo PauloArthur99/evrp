@@ -10,6 +10,124 @@
 using namespace std;
 #define ENERGY_CONST_LOAD 0.129285172
 
+// Estrutura de vizinhança 2-opt.
+pair<bool, vector<int>> twoOpt(vector<vector<double>> distMatrix, vector<vector<double>> energyMatrix, 
+                    vector<double> demands, vector<int> route, double energyOrigRoute)
+{
+    for (int i = 0; i < route.size() - 1; i++)
+    {
+        for (int j = i + 1; j < route.size(); j++)
+        {
+            vector<int> routeModified;
+            vector<int> auxVector;
+            for (int k = 0; k < i; k++)
+            {
+            routeModified.push_back(route[k]);
+            }
+
+            for (int k = i; k <= j; k++)
+            {
+            auxVector.push_back(route[k]);
+            }
+            reverse(auxVector.begin(), auxVector.end());
+
+            for (int k = 0; k < auxVector.size(); k++)
+            {
+            routeModified.push_back(auxVector[k]);
+            }
+
+            for (int k = j+1; k < route.size(); k++)
+            {
+            routeModified.push_back(route[k]);
+            }
+        }
+        if (requiredEnergyOneRoute(distMatrix, energyMatrix, demands, routeModified) < energyOrigRoute)
+        {
+            pair<bool, vector<int>> returnPair;
+            returnPair.first = true;
+            returnPair.second = routeModified;
+            return returnPair;
+        }
+    }
+    pair<bool, vector<int>> returnPair;
+    returnPair.first = false;
+    returnPair.second = routeModified;
+    return returnPair;
+}
+
+// Calcula a energia total consumida em uma rota.
+double requiredEnergyOneRoute(vector<vector<double>> distMatrix, vector<vector<double>> energyMatrix, 
+                    vector<double> demands, vector<int> route)
+{
+    double demandSum = 0;
+    for (int i = 0; i < route.size(); i++)
+    {
+        int elem = route[i];
+        demandSum += demands[elem];
+    }
+
+    int dest = route[0];
+    routeEnergy += energyMatrix[0][dest];
+    routeEnergy += distMatrix[0][dest] * demandSum * ENERGY_CONST_LOAD;
+    demandSum -= demands[dest];
+    for (int i = 0; i < route.size() - 1; i++)
+    {
+        int orig = route[i];
+        int dest = route[i+1];
+        routeEnergy += energyMatrix[orig][dest];
+        routeEnergy += distMatrix[orig][dest] * demandSum * ENERGY_CONST_LOAD;
+        demandSum -= demands[dest];
+    }
+    routeEnergy += energyMatrix[dest][0];
+    return routeEnergy;
+}
+
+// Calcula a energia total consumida na junção de duas rotas.
+double requiredEnergy(vector<vector<double>> distMatrix, vector<vector<double>> energyMatrix, 
+                    vector<double> demands, vector<int> routeA, vector<int> routeB, double demandSum, int pointA, int pointB)
+{
+    double routeEnergy = 0;
+    vector<int> route_copied;
+    route_copied = routeA;
+    if (routeA[0] == pointA)
+    {
+        reverse(route_copied.begin(), route_copied.end());
+    }
+    int dest = route_copied[0];
+    routeEnergy += energyMatrix[0][dest];
+    routeEnergy += distMatrix[0][dest] * demandSum * ENERGY_CONST_LOAD;
+    demandSum -= demands[dest];
+    for (int i = 0; i < route_copied.size() - 1; i++)
+    {
+        int orig = route_copied[i];
+        int dest = route_copied[i+1];
+        routeEnergy += energyMatrix[orig][dest];
+        routeEnergy += distMatrix[orig][dest] * demandSum * ENERGY_CONST_LOAD;
+        demandSum -= demands[dest];
+    }
+    routeEnergy += energyMatrix[pointA][pointB];
+    routeEnergy += distMatrix[pointA][pointB] * demandSum * ENERGY_CONST_LOAD;
+    demandSum -= demands[pointB];
+
+    vector<int> route_copied_B;
+    route_copied_B = routeB;
+    if (routeB[0] != pointB)
+    {
+        reverse(route_copied_B.begin(), route_copied_B.end());
+    }
+    for (int i = 0; i < route_copied_B.size() - 1; i++)
+    {
+        int orig = route_copied_B[i];
+        int dest = route_copied_B[i+1];
+        routeEnergy += energyMatrix[orig][dest];
+        routeEnergy += distMatrix[orig][dest] * demandSum * ENERGY_CONST_LOAD;
+        demandSum -= demands[dest];
+    }
+    routeEnergy += energyMatrix[dest][0];
+    return routeEnergy;
+}
+
+
 // Retorna a distancia euclidiana de dois pontos estruturados como pairs.
 double distancePoints(pair<double, double> a, pair<double, double> b)
 {
@@ -19,7 +137,7 @@ double distancePoints(pair<double, double> a, pair<double, double> b)
     return sqrt(pot1 + pot2);
 }
 
-// escreve as coordenadas dos pontos num arquivo
+// escreve as coordenadas dos pontos num arquivo.
 void writePoints(vector<pair<double,double>> points , string fileName)
 {
     ofstream MyFile(fileName); 
