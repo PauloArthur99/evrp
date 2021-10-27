@@ -12,8 +12,9 @@ using namespace std;
 
 // Estrutura de vizinhança 2-opt.
 pair<bool, vector<int>> twoOpt(vector<vector<double>> distMatrix, vector<vector<double>> energyMatrix, 
-                    vector<double> demands, vector<int> route, double energyOrigRoute)
+                    vector<double> demands, vector<int> route)
 {
+    double energyOrigRoute = requiredEnergyOneRoute(distMatrix, energyMatrix, demands, route);
     for (int i = 0; i < route.size() - 1; i++)
     {
         for (int j = i + 1; j < route.size(); j++)

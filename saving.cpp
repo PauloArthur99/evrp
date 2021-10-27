@@ -154,6 +154,22 @@ int main(int argc, char** argv){
     }
     //writeSolution(routes, "arquivoSoluções.txt");
 
+    for (int i = 0; i < routes.size(); i++)
+    {
+        bool ok = true;
+        vector<int> routeModified;
+        pair<bool, vector<int>> returnPair;
+        while (ok)
+        {
+            returnPair = twoOpt(distMatrix, energyMatrix, demands, route[i]);
+            ok = returnPair.first;
+            routeModified = returnPair.second;
+            if (ok)
+            {
+                route[i] = routeModified;
+            }
+        }
+    } 
 
     vector<double> routesEnergy;
     for (int i = 0; i < routes.size(); i++)
