@@ -64,6 +64,8 @@ int main(int argc, char** argv){
         }
     }
     
+    auto start = high_resolution_clock::now();
+
     // Cálculo das economias das arestas
     for (int i = 1; i < lastPoint; i++)
     {
@@ -152,8 +154,12 @@ int main(int argc, char** argv){
             }
         }     
     }
-    //writeSolution(routes, "arquivoSoluções.txt");
 
+    auto stop = high_resolution_clock::now();
+    auto duration = duration_cast<microseconds>(stop - start);
+    double durationSaving = duration.count();
+
+    auto start2 = high_resolution_clock::now();
     // Evolução do valor das rotas da instância.
     vector<vector<double>> solutionEvol;
     int counter = 0;
@@ -181,6 +187,9 @@ int main(int argc, char** argv){
             }
         }
     } 
+    auto stop2 = high_resolution_clock::now();
+    auto duration2 = duration_cast<microseconds>(stop2 - start2);
+    double duration2opt = duration2.count();
 
     vector<double> routesEnergy;
     for (int i = 0; i < routes.size(); i++)
@@ -215,7 +224,7 @@ int main(int argc, char** argv){
     string strSolucao = "/Users/paulo/Desktop/evrp/evrptw_instances/soluções/solução";
     strSolucao = strSolucao + argv[1];
     
-    writeSolution(routes, routesEnergy, strSolucao, counter, solutionEvol);
+    writeSolution(routes, routesEnergy, strSolucao, counter, solutionEvol, durationSaving, duration2opt);
 
 	return 0;
 }

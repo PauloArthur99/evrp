@@ -8,6 +8,8 @@
 #include <queue>
 #include <algorithm>
 #include<tuple>
+#include <chrono>
+using namespace std::chrono;
 using namespace std;
 #define ENERGY_CONST_LOAD 0.129285172
 
@@ -167,7 +169,8 @@ void writePoints(vector<pair<double,double>> points , string fileName)
 }
 
 // escreve as rotas encontradas em um arquivo
-void writeSolution(vector<vector<int>> routes, vector<double> routesEnergy, string fileName, int counter, vector<vector<double>> solutionEvol)
+void writeSolution(vector<vector<int>> routes, vector<double> routesEnergy, string fileName, int counter, 
+                    vector<vector<double>> solutionEvol, double durationSaving, double duration2opt)
 {
     ofstream MyFile(fileName); 
     MyFile << "RouteID    RoutePoints           Energy\n";
@@ -207,6 +210,8 @@ void writeSolution(vector<vector<int>> routes, vector<double> routesEnergy, stri
         }
         MyFile << "\n";
     }
+    MyFile << "Tempo utilizado pelo algoritmo de economias: " << durationSaving << "\n";
+    MyFile << "Tempo utilizado pelo hill climbing 2-opt: " << duration2opt << "\n";
 }
 
 vector<int> joinTwoRoutes(vector<int> vectA, int elemA, vector<int> vectB, int elemB)

@@ -4,3 +4,5 @@ R1         0 5 4 3 2 1 0     15341.2
 Número de movimentos: 2
 Evolução da Solução:
 R1         15359.3 15341.2 
+Tempo utilizado pelo algoritmo de economias: 264
+Tempo utilizado pelo hill climbing 2-opt: 242

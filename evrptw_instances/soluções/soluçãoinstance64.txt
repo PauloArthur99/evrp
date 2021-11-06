@@ -20,3 +20,5 @@ R6         11483.7 11184.3
 R7         12041.5 
 R8         13137.9 
 R9         8900.95 
+Tempo utilizado pelo algoritmo de economias: 60538
+Tempo utilizado pelo hill climbing 2-opt: 32239

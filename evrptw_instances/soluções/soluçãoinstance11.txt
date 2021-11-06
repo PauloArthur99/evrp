@@ -6,3 +6,5 @@ Número de movimentos: 3
 Evolução da Solução:
 R1         17008.4 
 R2         3019 3000.6 
+Tempo utilizado pelo algoritmo de economias: 824
+Tempo utilizado pelo hill climbing 2-opt: 668
