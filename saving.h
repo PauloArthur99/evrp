@@ -7,14 +7,45 @@
 #include <cmath>
 #include <queue>
 #include <algorithm>
+#include<tuple>
 using namespace std;
 #define ENERGY_CONST_LOAD 0.129285172
 
-// Estrutura de vizinhança 2-opt.
-pair<bool, vector<int>> twoOpt(vector<vector<double>> distMatrix, vector<vector<double>> energyMatrix, 
+// Calcula a energia total consumida em uma rota.
+double requiredEnergyOneRoute(vector<vector<double>> distMatrix, vector<vector<double>> energyMatrix, 
                     vector<double> demands, vector<int> route)
 {
-    double energyOrigRoute = requiredEnergyOneRoute(distMatrix, energyMatrix, demands, route);
+    double routeEnergy = 0;
+    double demandSum = 0;
+    for (int i = 0; i < route.size(); i++)
+    {
+        int elem = route[i];
+        demandSum += demands[elem];
+    }
+
+    int dest = route[0];
+    routeEnergy += energyMatrix[0][dest];
+    routeEnergy += distMatrix[0][dest] * demandSum * ENERGY_CONST_LOAD;
+    demandSum -= demands[dest];
+    for (int i = 0; i < route.size() - 1; i++)
+    {
+        int orig = route[i];
+        int dest = route[i+1];
+        routeEnergy += energyMatrix[orig][dest];
+        routeEnergy += distMatrix[orig][dest] * demandSum * ENERGY_CONST_LOAD;
+        demandSum -= demands[dest];
+    }
+    int idx = route.size() - 1;
+    int orig = route[idx];
+    routeEnergy += energyMatrix[orig][0];
+    return routeEnergy;
+}
+
+// Estrutura de vizinhança 2-opt.
+tuple<bool, vector<int>, double> twoOpt(vector<vector<double>> distMatrix, vector<vector<double>> energyMatrix, 
+                    vector<double> demands, vector<int> route, double energyOrigRoute)
+{
+    vector<int> tempRoute = route;
     for (int i = 0; i < route.size() - 1; i++)
     {
         for (int j = i + 1; j < route.size(); j++)
@@ -41,46 +72,19 @@ pair<bool, vector<int>> twoOpt(vector<vector<double>> distMatrix, vector<vector<
             {
             routeModified.push_back(route[k]);
             }
+            tempRoute = routeModified; 
         }
-        if (requiredEnergyOneRoute(distMatrix, energyMatrix, demands, routeModified) < energyOrigRoute)
+        double newEnergy = requiredEnergyOneRoute(distMatrix, energyMatrix, demands, tempRoute);
+        if (newEnergy < energyOrigRoute)
         {
-            pair<bool, vector<int>> returnPair;
-            returnPair.first = true;
-            returnPair.second = routeModified;
-            return returnPair;
+            tuple<bool, vector<int>, double> returnTuple;
+            returnTuple = make_tuple(true, tempRoute, newEnergy);
+            return returnTuple;
         }
     }
-    pair<bool, vector<int>> returnPair;
-    returnPair.first = false;
-    returnPair.second = routeModified;
-    return returnPair;
-}
-
-// Calcula a energia total consumida em uma rota.
-double requiredEnergyOneRoute(vector<vector<double>> distMatrix, vector<vector<double>> energyMatrix, 
-                    vector<double> demands, vector<int> route)
-{
-    double demandSum = 0;
-    for (int i = 0; i < route.size(); i++)
-    {
-        int elem = route[i];
-        demandSum += demands[elem];
-    }
-
-    int dest = route[0];
-    routeEnergy += energyMatrix[0][dest];
-    routeEnergy += distMatrix[0][dest] * demandSum * ENERGY_CONST_LOAD;
-    demandSum -= demands[dest];
-    for (int i = 0; i < route.size() - 1; i++)
-    {
-        int orig = route[i];
-        int dest = route[i+1];
-        routeEnergy += energyMatrix[orig][dest];
-        routeEnergy += distMatrix[orig][dest] * demandSum * ENERGY_CONST_LOAD;
-        demandSum -= demands[dest];
-    }
-    routeEnergy += energyMatrix[dest][0];
-    return routeEnergy;
+    tuple<bool, vector<int>, double> returnTuple;
+    returnTuple = make_tuple(false, route, 0);
+    return returnTuple;
 }
 
 // Calcula a energia total consumida na junção de duas rotas.
@@ -163,7 +167,7 @@ void writePoints(vector<pair<double,double>> points , string fileName)
 }
 
 // escreve as rotas encontradas em um arquivo
-void writeSolution(vector<vector<int>> routes, vector<double> routesEnergy, string fileName)
+void writeSolution(vector<vector<int>> routes, vector<double> routesEnergy, string fileName, int counter, vector<vector<double>> solutionEvol)
 {
     ofstream MyFile(fileName); 
     MyFile << "RouteID    RoutePoints           Energy\n";
@@ -183,6 +187,25 @@ void writeSolution(vector<vector<int>> routes, vector<double> routesEnergy, stri
             MyFile << routes[i][j] << " ";
         }
         MyFile << "    " << routesEnergy[i] << "\n";
+    }
+    MyFile << "--------------------------------------------------------------------------" << "\n";
+    MyFile << "Número de movimentos:" << " " << counter << "\n";
+    MyFile << "Evolução da Solução:" << "\n";
+    for (int i = 0; i < solutionEvol.size(); i++)
+    {
+        if (i + 1 < 10)
+        {
+            MyFile << "R" << i + 1 << "         ";
+        }
+        else
+        {
+            MyFile << "R" << i + 1 << "        ";
+        }
+        for (int j = 0; j < solutionEvol[i].size(); j++)
+        {
+            MyFile << solutionEvol[i][j] << " ";
+        }
+        MyFile << "\n";
     }
 }
 

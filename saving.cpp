@@ -154,19 +154,30 @@ int main(int argc, char** argv){
     }
     //writeSolution(routes, "arquivoSoluções.txt");
 
+    // Evolução do valor das rotas da instância.
+    vector<vector<double>> solutionEvol;
+    int counter = 0;
     for (int i = 0; i < routes.size(); i++)
     {
+        vector<double> auxVet{};
+        solutionEvol.push_back(auxVet);
+        double requiredEnergy = requiredEnergyOneRoute(distMatrix, energyMatrix, demands, routes[i]);
+        solutionEvol[i].push_back(requiredEnergy);
+
         bool ok = true;
         vector<int> routeModified;
-        pair<bool, vector<int>> returnPair;
+        tuple<bool, vector<int>, double> returnTuple;
         while (ok)
         {
-            returnPair = twoOpt(distMatrix, energyMatrix, demands, route[i]);
-            ok = returnPair.first;
-            routeModified = returnPair.second;
+            counter++;
+            returnTuple = twoOpt(distMatrix, energyMatrix, demands, routes[i], requiredEnergy);
+            ok = get<0>(returnTuple);
+            routeModified = get<1>(returnTuple);
+            requiredEnergy = get<2>(returnTuple);
             if (ok)
             {
-                route[i] = routeModified;
+                routes[i] = routeModified;
+                solutionEvol[i].push_back(get<2>(returnTuple));
             }
         }
     } 
@@ -204,7 +215,7 @@ int main(int argc, char** argv){
     string strSolucao = "/Users/paulo/Desktop/evrp/evrptw_instances/soluções/solução";
     strSolucao = strSolucao + argv[1];
     
-    writeSolution(routes, routesEnergy, strSolucao);
+    writeSolution(routes, routesEnergy, strSolucao, counter, solutionEvol);
 
 	return 0;
 }
