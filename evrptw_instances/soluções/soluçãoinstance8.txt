@@ -1,10 +1,10 @@
 RouteID    RoutePoints           Energy
 R1         0 7 10 9 3 1 0     13191.3
-R2         0 8 2 4 6 5 0     13174.4
+R2         0 5 6 4 8 2 0     13167.8
 --------------------------------------------------------------------------
 Número de movimentos: 4
 Evolução da Solução:
 R1         13725.9 13191.3 
-R2         13266.9 13174.4 
-Tempo utilizado pelo algoritmo de economias: 448
-Tempo utilizado pelo hill climbing 2-opt: 270
+R2         13266.9 13167.8 
+Tempo utilizado pelo algoritmo de economias: 451
+Tempo utilizado pelo hill climbing 2-opt: 371

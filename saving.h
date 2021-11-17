@@ -9,6 +9,7 @@
 #include <algorithm>
 #include<tuple>
 #include <chrono>
+#include <limits>
 using namespace std::chrono;
 using namespace std;
 #define ENERGY_CONST_LOAD 0.129285172
@@ -41,6 +42,51 @@ double requiredEnergyOneRoute(vector<vector<double>> distMatrix, vector<vector<d
     int orig = route[idx];
     routeEnergy += energyMatrix[orig][0];
     return routeEnergy;
+}
+
+// Estrutura de vizinhança 2-opt*.
+tuple<bool, vector<int>, double> twoOptStar(vector<vector<double>> distMatrix, vector<vector<double>> energyMatrix, 
+                    vector<double> demands, vector<int> route1, vector<int> route2, double energyOrigRoute)
+{
+    vector<int> tempRoute = route;
+    for (int i = 1; i < route.size(); i++)
+    {
+        for (int j = 1; j < route.size(); j++)
+        {
+            vector<int> routeModified1;
+            vector<int> auxVector;
+            for (int k = 0; k < i; k++)
+            {
+            routeModified1.push_back(route1[k]);
+            }
+            for (int k = j; k < route2.size(); k++)
+            {
+            routeModified1.push_back(route2[k]);
+            }
+            
+            for (int k = 0; k < j; k++)
+            {
+            routeModified2.push_back(route2[k]);
+            }
+            for (int k = i; k < route1.size(); k++)
+            {
+            routeModified2.push_back(route1[k]);
+            }
+            
+
+            tempRoute = routeModified; 
+        }
+        double newEnergy = requiredEnergyOneRoute(distMatrix, energyMatrix, demands, tempRoute);
+        if (newEnergy < energyOrigRoute)
+        {
+            tuple<bool, vector<int>, double> returnTuple;
+            returnTuple = make_tuple(true, tempRoute, newEnergy);
+            return returnTuple;
+        }
+    }
+    tuple<bool, vector<int>, double> returnTuple;
+    returnTuple = make_tuple(false, route, 0);
+    return returnTuple;
 }
 
 // Estrutura de vizinhança 2-opt.
@@ -87,6 +133,61 @@ tuple<bool, vector<int>, double> twoOpt(vector<vector<double>> distMatrix, vecto
     tuple<bool, vector<int>, double> returnTuple;
     returnTuple = make_tuple(false, route, 0);
     return returnTuple;
+}
+
+// Estrutura de vizinhança 2-opt Best.
+tuple<bool, vector<int>, double> twoOptBest(vector<vector<double>> distMatrix, vector<vector<double>> energyMatrix, 
+                    vector<double> demands, vector<int> route, double energyOrigRoute)
+{
+    vector<int> tempRoute = route;
+    vector<int> bestRoute;
+    bool bestFound = false;
+    double bestEnergy = std::numeric_limits<double>::infinity();
+    for (int i = 0; i < route.size() - 1; i++)
+    {
+        for (int j = i + 1; j < route.size(); j++)
+        {
+            vector<int> routeModified;
+            vector<int> auxVector;
+            for (int k = 0; k < i; k++)
+            {
+            routeModified.push_back(route[k]);
+            }
+
+            for (int k = i; k <= j; k++)
+            {
+            auxVector.push_back(route[k]);
+            }
+            reverse(auxVector.begin(), auxVector.end());
+
+            for (int k = 0; k < auxVector.size(); k++)
+            {
+            routeModified.push_back(auxVector[k]);
+            }
+
+            for (int k = j+1; k < route.size(); k++)
+            {
+            routeModified.push_back(route[k]);
+            }
+            tempRoute = routeModified; 
+        }
+        double newEnergy = requiredEnergyOneRoute(distMatrix, energyMatrix, demands, tempRoute);
+        if (newEnergy < energyOrigRoute)
+        {
+            bestRoute = tempRoute;
+            bestEnergy = newEnergy;
+            bestFound = true;
+        }
+    }
+    tuple<bool, vector<int>, double> returnTuple;
+    if (bestFound)
+    {
+        returnTuple = make_tuple(true, bestRoute, bestEnergy);
+        return returnTuple;
+    }else{
+        returnTuple = make_tuple(false, route, 0);
+        return returnTuple;
+    }
 }
 
 // Calcula a energia total consumida na junção de duas rotas.

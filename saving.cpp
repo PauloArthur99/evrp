@@ -176,7 +176,7 @@ int main(int argc, char** argv){
         while (ok)
         {
             counter++;
-            returnTuple = twoOpt(distMatrix, energyMatrix, demands, routes[i], requiredEnergy);
+            returnTuple = twoOptBest(distMatrix, energyMatrix, demands, routes[i], requiredEnergy);
             ok = get<0>(returnTuple);
             routeModified = get<1>(returnTuple);
             requiredEnergy = get<2>(returnTuple);
