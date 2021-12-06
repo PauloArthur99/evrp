@@ -7,14 +7,15 @@ public:
     double loadCapacity();
     vector<vector<double>> distMatrix();
     vector<vector<double>> energyMatrix();
-    
+    int lastPoint();
 
+    int _lastPoint;
 	vector<pair<double, double>> _points;
     vector<double> _demands;
     double _loadCapacity;
 	vector<vector<double>> _distMatrix;
 	vector<vector<double>> _energyMatrix;
-}
+};
 
 EvrpData::EvrpData(string instance) {
     string myText;
@@ -53,7 +54,7 @@ EvrpData::EvrpData(string instance) {
     MyReadFile.close();
 
 	int sizePoints = _points.size();
-    int lastPoint = sizePoints - 1;
+    _lastPoint = sizePoints - 1;
 	vector<vector<double>> auxMatrix(sizePoints, vector<double>(sizePoints, 0.0));
 
 	_distMatrix = auxMatrix;
@@ -68,6 +69,10 @@ EvrpData::EvrpData(string instance) {
             _energyMatrix[i][j] = ENERGY_CONST * _distMatrix[i][j];
         }
     }
+}
+
+int EvrpData::lastPoint(){
+    return _lastPoint;
 }
 
 vector<double> EvrpData::demands(){

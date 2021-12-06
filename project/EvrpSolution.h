@@ -1,4 +1,3 @@
-#include "EvrpUtils.h"
 class EvrpSolution {
 public:
     EvrpData* _evrpData;
@@ -6,10 +5,10 @@ public:
     vector<double> _routesEnergy;
     vector<vector<int>> routes();
     vector<double> routesEnergy();
-    EvrpSolution(EvrpData evrpDataParameter);
-    savingsAlg();
-    insertDepoAndEnergies();   
-}
+    EvrpSolution(EvrpData* evrpDataParameter);
+    void savingsAlg();
+    void insertDepoAndEnergies();   
+};
 
 vector<vector<int>> EvrpSolution::routes() {
     return _routes;
@@ -20,18 +19,19 @@ vector<double> EvrpSolution::routesEnergy() {
 }
 
 EvrpSolution::EvrpSolution(EvrpData* evrpDataParameter) {
-    _evrpData = &evrpDataParameter;
-    for (int i = 1; i <= lastPoint; i++)
+    _evrpData = evrpDataParameter;
+    for (int i = 1; i <= _evrpData->lastPoint(); i++)
     {
         vector<int> aux{i};
         _routes.push_back(aux);
     }
 }
 
-EvrpSolution::savingsAlg() {
+void EvrpSolution::savingsAlg() {
     priority_queue<saving> savingQueue;
     vector<vector<double>> distMatrix = _evrpData->distMatrix();
-    vector<double> demands = _evrpData->demands()
+    vector<vector<double>> energyMatrix = _evrpData->energyMatrix();
+    vector<double> demands = _evrpData->demands();
 
     // Cálculo das economias das arestas
     for (int i = 1; i < _evrpData->pointsSize() - 1; i++)
@@ -85,28 +85,28 @@ EvrpSolution::savingsAlg() {
                     demandSum += demands[elem];
                 } 
 
-                if (demandSum <= loadCapacity)
+                if (demandSum <= _evrpData->loadCapacity())
                 {   
                     double spentEnergy = requiredEnergy(distMatrix, energyMatrix, 
-                    demands, routes[idxA], routes[idxB], demandSum, pointA, pointB);
+                    demands, _routes[idxA], _routes[idxB], demandSum, pointA, pointB);
 
                     double spentEnergyReverse = requiredEnergy(distMatrix, energyMatrix, 
-                    demands, routes[idxB], routes[idxA], demandSum, pointB, pointA);
+                    demands, _routes[idxB], _routes[idxA], demandSum, pointB, pointA);
 
                     if (spentEnergy <= 18000 && spentEnergyReverse <= 18000)
                     {
-                        vector<int> routesJoined = joinTwoRoutes(routes[idxA], pointA, routes[idxB], pointB);
+                        vector<int> routesJoined = joinTwoRoutes(_routes[idxA], pointA, _routes[idxB], pointB);
                         _routes.push_back(routesJoined);
 
                         if (idxA < idxB)
                         {
-                            _routes.erase(routes.begin() + idxA);
-                            _routes.erase(routes.begin() + idxB - 1);
+                            _routes.erase(_routes.begin() + idxA);
+                            _routes.erase(_routes.begin() + idxB - 1);
                         }
                         else
                         {
-                            _routes.erase(routes.begin() + idxA);
-                            _routes.erase(routes.begin() + idxB);
+                            _routes.erase(_routes.begin() + idxA);
+                            _routes.erase(_routes.begin() + idxB);
                         }
                     }                    
                 }
@@ -116,8 +116,7 @@ EvrpSolution::savingsAlg() {
 
 }
 
-EvrpSolution::insertDepoAndEnergies() {
-    vector<double> routesEnergy;
+void EvrpSolution::insertDepoAndEnergies() {
     vector<double> demands = _evrpData->demands();
     vector<vector<double>> distMatrix = _evrpData->distMatrix();
     vector<vector<double>> energyMatrix = _evrpData->energyMatrix();
@@ -128,11 +127,11 @@ EvrpSolution::insertDepoAndEnergies() {
         double energySum = 0;
         for (int j = 0; j < _routes[i].size(); j++)
         {
-            int customer = routes[i][j];
-            customerDemand += _demands[customer];
+            int customer = _routes[i][j];
+            customerDemand += demands[customer];
         }
 
-        _routes[i].insert(routes[i].begin(), 0);
+        _routes[i].insert(_routes[i].begin(), 0);
         _routes[i].push_back(0);
 
         for (int j = 0; j < _routes[i].size()-1; j++)
@@ -143,6 +142,6 @@ EvrpSolution::insertDepoAndEnergies() {
             energySum += distMatrix[orig][dest] * customerDemand * ENERGY_CONST_LOAD;
             customerDemand -= demands[dest];
         }
-        routesEnergy.push_back(energySum);
+        _routesEnergy.push_back(energySum);
     }
 }
