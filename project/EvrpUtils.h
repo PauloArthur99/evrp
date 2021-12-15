@@ -402,3 +402,46 @@ bool operator< (const saving sav1, const saving sav2)
 {
 	return sav1.saving < sav2.saving;	
 }
+
+/*
+void hill_climb(EvrpSolution* evrpSolution, int neighborhood)
+{   
+
+    bool ok = true;
+    while (ok)
+    {
+        ok = evrpSolution->get_neighbor(neighborhood);
+    }
+}
+*/
+
+void hill_climb(EvrpSolution* evrpSolution, int neighborhood)
+{   
+    if (neighborhood == 1){
+        hill_climb_2opt(evrpSolution);
+    }
+}
+
+void hill_climb_2opt(EvrpSolution* evrpSolution){
+    for (int i = 0; i < routes.size(); i++)
+    {
+        double requiredEnergy = requiredEnergyOneRoute(distMatrix, energyMatrix, demands, routes[i]);
+
+        bool ok = true;
+        vector<int> routeModified;
+        tuple<bool, vector<int>, double> returnTuple;
+        while (ok)
+        {
+            counter++;
+            returnTuple = twoOpt(distMatrix, energyMatrix, demands, routes[i], requiredEnergy);
+            ok = get<0>(returnTuple);
+            routeModified = get<1>(returnTuple);
+            requiredEnergy = get<2>(returnTuple);
+            if (ok)
+            {
+                routes[i] = routeModified;
+                solutionEvol[i].push_back(get<2>(returnTuple));
+            }
+        }
+    }
+}

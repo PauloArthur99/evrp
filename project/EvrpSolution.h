@@ -2,16 +2,22 @@ class EvrpSolution {
 public:
     EvrpData* _evrpData;
     vector<vector<int>> _routes;
+    void set_route(int i, vector<int> new_route);
     vector<double> _routesEnergy;
     vector<vector<int>> routes();
     vector<double> routesEnergy();
     EvrpSolution(EvrpData* evrpDataParameter);
     void savingsAlg();
     void insertDepoAndEnergies();   
+    tuple<bool, vector<int>, double> twoOpt(vector<int> route);
 };
 
 vector<vector<int>> EvrpSolution::routes() {
     return _routes;
+}
+
+void EvrpSolution::set_route(int i, vector<int> new_route) {
+    _routes[i] =  new_route;
 }
 
 vector<double> EvrpSolution::routesEnergy() {
@@ -144,4 +150,49 @@ void EvrpSolution::insertDepoAndEnergies() {
         }
         _routesEnergy.push_back(energySum);
     }
+}
+
+// Estrutura de vizinhança 2-opt.
+tuple<bool, vector<int>, double> EvrpSolution::twoOpt(vector<int> route)
+{
+    vector<int> tempRoute = route;
+    for (int i = 0; i < route.size() - 1; i++)
+    {
+        for (int j = i + 1; j < route.size(); j++)
+        {
+            vector<int> routeModified;
+            vector<int> auxVector;
+            for (int k = 0; k < i; k++)
+            {
+            routeModified.push_back(route[k]);
+            }
+
+            for (int k = i; k <= j; k++)
+            {
+            auxVector.push_back(route[k]);
+            }
+            reverse(auxVector.begin(), auxVector.end());
+
+            for (int k = 0; k < auxVector.size(); k++)
+            {
+            routeModified.push_back(auxVector[k]);
+            }
+
+            for (int k = j+1; k < route.size(); k++)
+            {
+            routeModified.push_back(route[k]);
+            }
+            tempRoute = routeModified; 
+        }
+        double newEnergy = requiredEnergyOneRoute(distMatrix, energyMatrix, demands, tempRoute);
+        if (newEnergy < energyOrigRoute)
+        {
+            tuple<bool, vector<int>, double> returnTuple;
+            returnTuple = make_tuple(true, tempRoute, newEnergy);
+            return returnTuple;
+        }
+    }
+    tuple<bool, vector<int>, double> returnTuple;
+    returnTuple = make_tuple(false, route, 0);
+    return returnTuple;
 }
