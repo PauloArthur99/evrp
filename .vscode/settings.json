@@ -18,6 +18,13 @@
   "C_Cpp_Runner.warningsAsError": false,
   "C_Cpp.errorSquiggles": "Disabled",
   "files.associations": {
-    "vector": "cpp"
+    "vector": "cpp",
+    "__functional_base": "cpp",
+    "array": "cpp",
+    "istream": "cpp",
+    "locale": "cpp",
+    "memory": "cpp",
+    "tuple": "cpp",
+    "utility": "cpp"
   }
 }
