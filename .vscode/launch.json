@@ -1,11 +1,36 @@
 {
   "version": "0.2.0",
   "configurations": [
+
     {
       "name": "(lldb) Launch",
       "type": "cppdbg",
       "request": "launch",
-      "program": "enter program name, for example ${workspaceFolder}/a.out",
+      "program": "${workspaceFolder}/evrp",
+      "args": [],
+      "stopAtEntry": true,
+      "cwd": "${fileDirname}",
+      "environment": [],
+      "externalConsole": false,
+      "MIMode": "lldb"
+    },
+    {
+      "name": "(lldb) Launch",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/evrp",
+      "args": [],
+      "stopAtEntry": false,
+      "cwd": "${fileDirname}",
+      "environment": [],
+      "externalConsole": false,
+      "MIMode": "lldb"
+    },
+    {
+      "name": "(lldb) Launch",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/evrp",
       "args": [],
       "stopAtEntry": false,
       "cwd": "${fileDirname}",
@@ -17,7 +42,7 @@
       "name": "(lldb) Attach",
       "type": "cppdbg",
       "request": "attach",
-      "program": "enter program name, for example ${workspaceFolder}/a.out",
+      "program": "${workspaceFolder}/evrp",
       "processId": "${command:pickProcess}",
       "MIMode": "lldb"
     },
