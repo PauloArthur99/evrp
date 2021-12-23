@@ -8,7 +8,7 @@ int main(int argc, char** argv){
     EvrpData evrpDataobj = EvrpData(argv[1]);
     EvrpSolution evrpSolution = EvrpSolution(&evrpDataobj);
     evrpSolution.savingsAlg();
-    hillClimbingEachRoute(&evrpSolution, 0);
+    hillClimbingEachRoute(&evrpSolution, 1);
     
     evrpSolution.insertDepoAndEnergies();
     string strSolucao = "/Users/paulo/Desktop/evrp/evrptw_instances/soluções/solução";

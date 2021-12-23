@@ -9,7 +9,9 @@ public:
     void savingsAlg();
     void insertDepoAndEnergies();   
     tuple<bool, vector<int>, double> twoOptFirst(int idxRoute);
+    tuple<bool, vector<int>, double> twoOptBest(int idxRoute);
     tuple<bool, vector<int>, double> get_neighbor(int idxRoute, int neighborhood);
+    double requiredEnergySolution();
 
     EvrpData* _evrpData;
     vector<vector<int>> _routes;
@@ -203,15 +205,144 @@ tuple<bool, vector<int>, double> EvrpSolution::twoOptFirst(int idxRoute)
     return returnTuple;
 }
 
+// Estrutura de vizinhança 2-opt Best.
+tuple<bool, vector<int>, double> EvrpSolution::twoOptBest(int idxRoute)
+{
+    vector<int> route = _routes[idxRoute];
+    double energyOrigRoute = _evrpData->requiredEnergyOneRoute(route);
+    vector<int> tempRoute = route;
+    vector<int> bestRoute;
+    bool bestFound = false;
+    double bestEnergy = std::numeric_limits<double>::infinity();
+    for (int i = 0; i < route.size() - 1; i++)
+    {
+        for (int j = i + 1; j < route.size(); j++)
+        {
+            vector<int> routeModified;
+            vector<int> auxVector;
+            for (int k = 0; k < i; k++)
+            {
+            routeModified.push_back(route[k]);
+            }
+
+            for (int k = i; k <= j; k++)
+            {
+            auxVector.push_back(route[k]);
+            }
+            reverse(auxVector.begin(), auxVector.end());
+
+            for (int k = 0; k < auxVector.size(); k++)
+            {
+            routeModified.push_back(auxVector[k]);
+            }
+
+            for (int k = j+1; k < route.size(); k++)
+            {
+            routeModified.push_back(route[k]);
+            }
+            tempRoute = routeModified; 
+        }
+        double newEnergy = _evrpData->requiredEnergyOneRoute(tempRoute);
+        if (newEnergy < energyOrigRoute)
+        {
+            bestRoute = tempRoute;
+            bestEnergy = newEnergy;
+            bestFound = true;
+        }
+    }
+    tuple<bool, vector<int>, double> returnTuple;
+    if (bestFound)
+    {
+        returnTuple = make_tuple(true, bestRoute, bestEnergy);
+        return returnTuple;
+    }else{
+        returnTuple = make_tuple(false, route, 0);
+        return returnTuple;
+    }
+}
+
 tuple<bool, vector<int>, double> EvrpSolution::get_neighbor(int idxRoute, int neighborhood) {
     #define VIZINHO_2OPT_FIRST 0
     #define VIZINHO_2OPT_BEST 1
 
-    //if (neighborhood == VIZINHO_2OPT_FIRST) {
+    if (neighborhood == VIZINHO_2OPT_FIRST) {
         return twoOptFirst(idxRoute);
-    //}
+    } else {
+        return twoOptBest(idxRoute);
+    }
 }
 
 int EvrpSolution::routes_size(){
     return _routes.size();
+}
+
+// Estrutura de vizinhança 2-opt*.
+bool twoOptStarFirst()
+{
+    double energyOrig = requiredEnergySolution();
+    vector<int> route1, route2;
+    vector<int> temp1, temp2;
+
+    for (int idxRoute1 = 0; idxRoute1 < _routes.size(); idxRoute1++){
+        route1 = _routes[idxRoute1];
+        for (int idxRoute2 = 0; idxRoute2 < _routes.size(); idxRoute2++){
+            route2 _routes[idxRoute2];
+            for (int i = 1; i < route.size(); i++)
+            {
+                for (int j = 1; j < route.size(); j++)
+                {
+                    vector<int> routeModified1, routeModified2;
+                    for (int k = 0; k < i; k++)
+                    {
+                    routeModified1.push_back(route1[k]);
+                    }
+                    for (int k = j; k < route2.size(); k++)
+                    {
+                    routeModified1.push_back(route2[k]);
+                    }
+                    
+                    for (int k = 0; k < j; k++)
+                    {
+                    routeModified2.push_back(route2[k]);
+                    }
+                    for (int k = i; k < route1.size(); k++)
+                    {
+                    routeModified2.push_back(route1[k]);
+                    }
+                    temp1 = routeModified1;
+                    temp2 = routeModified2;
+                }
+
+                double newEnergy = requiredEnergyOneRoute(temp1);
+                newEnergy += requiredEnergyOneRoute(temp2);
+                vector<int> auxRoute;
+                for (int i = 0; i < _routes.size(); i++){
+                    if (i == idxRoute1 || i == idxRoute2){
+                        continue;
+                    }
+                    auxRoute = _routes[i];
+                    newEnergy += _evrpData->requiredEnergyOneRoute(auxRoute)
+                }
+                if (newEnergy < energyOrig)
+                {
+                    _routes[idxRoute1] = temp1;
+                    _routes[idxRoute2] = temp2;
+                    return true;
+                }
+            }
+        }
+    }
+    tuple<bool, vector<int>, double> returnTuple;
+    returnTuple = make_tuple(false, route, 0);
+    return returnTuple;
+}
+
+double EvrpSolution::requiredEnergySolution(){
+    vector<int> tempRoute;
+    double totalEnergy = 0;
+    for (int i = 0; i < _routes.size(); i++){
+        tempRoute = _routes[i];
+        totalEnergy += _evrpData->requiredEnergyOneRoute(tempRoute)
+    }
+    return totalEnergy;
 }
