@@ -17,3 +17,14 @@ void hillClimbingEachRoute(EvrpSolution* evrpSolution, int neighborhood){
         }
     }
 }
+
+void hillClimbingSolution(EvrpSolution* evrpSolution, int neighborhood){
+    #define VIZINHO_2OPT_STAR_FIRST 0
+    #define VIZINHO_2OPT_STAR_BEST 1
+    bool ok = true;
+    while (ok)
+    {
+        ok = evrpSolution->twoOptStarFirst();
+    }
+    
+}

@@ -12,6 +12,7 @@ public:
     tuple<bool, vector<int>, double> twoOptBest(int idxRoute);
     tuple<bool, vector<int>, double> get_neighbor(int idxRoute, int neighborhood);
     double requiredEnergySolution();
+    bool twoOptStarFirst();
 
     EvrpData* _evrpData;
     vector<vector<int>> _routes;
@@ -277,19 +278,18 @@ int EvrpSolution::routes_size(){
 }
 
 // Estrutura de vizinhança 2-opt*.
-bool twoOptStarFirst()
+bool EvrpSolution::twoOptStarFirst()
 {
-    double energyOrig = requiredEnergySolution();
     vector<int> route1, route2;
     vector<int> temp1, temp2;
 
-    for (int idxRoute1 = 0; idxRoute1 < _routes.size(); idxRoute1++){
+    for (int idxRoute1 = 0; idxRoute1 < _routes.size() - 1; idxRoute1++){
         route1 = _routes[idxRoute1];
-        for (int idxRoute2 = 0; idxRoute2 < _routes.size(); idxRoute2++){
-            route2 _routes[idxRoute2];
-            for (int i = 1; i < route.size(); i++)
+        for (int idxRoute2 = idxRoute1 + 1; idxRoute2 < _routes.size(); idxRoute2++){
+            route2 = _routes[idxRoute2];
+            for (int i = 1; i < route1.size(); i++)
             {
-                for (int j = 1; j < route.size(); j++)
+                for (int j = 1; j < route2.size(); j++)
                 {
                     vector<int> routeModified1, routeModified2;
                     for (int k = 0; k < i; k++)
@@ -313,17 +313,13 @@ bool twoOptStarFirst()
                     temp2 = routeModified2;
                 }
 
-                double newEnergy = requiredEnergyOneRoute(temp1);
-                newEnergy += requiredEnergyOneRoute(temp2);
-                vector<int> auxRoute;
-                for (int i = 0; i < _routes.size(); i++){
-                    if (i == idxRoute1 || i == idxRoute2){
-                        continue;
-                    }
-                    auxRoute = _routes[i];
-                    newEnergy += _evrpData->requiredEnergyOneRoute(auxRoute)
-                }
-                if (newEnergy < energyOrig)
+                double newEnergy = _evrpData->requiredEnergyOneRoute(temp1);
+                newEnergy += _evrpData->requiredEnergyOneRoute(temp2);
+
+                double oldEnergy = _evrpData->requiredEnergyOneRoute(_routes[idxRoute1]);
+                oldEnergy += _evrpData->requiredEnergyOneRoute(_routes[idxRoute2]);
+
+                if (newEnergy < oldEnergy)
                 {
                     _routes[idxRoute1] = temp1;
                     _routes[idxRoute2] = temp2;
@@ -332,9 +328,7 @@ bool twoOptStarFirst()
             }
         }
     }
-    tuple<bool, vector<int>, double> returnTuple;
-    returnTuple = make_tuple(false, route, 0);
-    return returnTuple;
+    return false;
 }
 
 double EvrpSolution::requiredEnergySolution(){
@@ -342,7 +336,7 @@ double EvrpSolution::requiredEnergySolution(){
     double totalEnergy = 0;
     for (int i = 0; i < _routes.size(); i++){
         tempRoute = _routes[i];
-        totalEnergy += _evrpData->requiredEnergyOneRoute(tempRoute)
+        totalEnergy += _evrpData->requiredEnergyOneRoute(tempRoute);
     }
     return totalEnergy;
 }
