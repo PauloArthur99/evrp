@@ -9,6 +9,7 @@ public:
     vector<vector<double>> energyMatrix();
     int lastPoint();
     double requiredEnergyOneRoute(vector<int> route);
+    bool requiredDemand(vector<int> route);
 
     int _lastPoint;
 	vector<pair<double, double>> _points;
@@ -121,4 +122,18 @@ double EvrpData::requiredEnergyOneRoute(vector<int> route) {
     int orig = route[idx];
     routeEnergy += _energyMatrix[orig][0];
     return routeEnergy;
+}
+
+bool EvrpData::requiredDemand(vector<int> route){
+    double demandSum = 0;
+    for (int i = 0; i < route.size(); i++)
+    {
+        int elem = route[i];
+        demandSum += _demands[elem];
+    }
+    if (demandSum <= _loadCapacity){
+        return true;
+    } else {
+        return false;
+    } 
 }

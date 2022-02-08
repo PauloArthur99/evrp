@@ -11,7 +11,7 @@ int main(int argc, char** argv){
     hillClimbingSolution(&evrpSolution, 0);
     
     evrpSolution.insertDepoAndEnergies();
-    string strSolucao = "/Users/paulo/Desktop/evrp/evrptw_instances/soluções/solução";
+    string strSolucao = "/Users/paulo/Desktop/test/evrptw_instances/soluções/solução";
     strSolucao = strSolucao + argv[1];
 
     writeSolutionSavings(evrpSolution.routes(), evrpSolution.routesEnergy(), strSolucao);

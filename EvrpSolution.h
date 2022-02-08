@@ -13,6 +13,7 @@ public:
     tuple<bool, vector<int>, double> get_neighbor(int idxRoute, int neighborhood);
     double requiredEnergySolution();
     bool twoOptStarFirst();
+    bool twoOptStarBest();
 
     EvrpData* _evrpData;
     vector<vector<int>> _routes;
@@ -246,9 +247,12 @@ tuple<bool, vector<int>, double> EvrpSolution::twoOptBest(int idxRoute)
         double newEnergy = _evrpData->requiredEnergyOneRoute(tempRoute);
         if (newEnergy < energyOrigRoute)
         {
+            if (newEnergy < bestEnergy)
+            {
             bestRoute = tempRoute;
             bestEnergy = newEnergy;
             bestFound = true;
+            }
         }
     }
     tuple<bool, vector<int>, double> returnTuple;
@@ -277,16 +281,29 @@ int EvrpSolution::routes_size(){
     return _routes.size();
 }
 
-// Estrutura de vizinhança 2-opt*.
+// Estrutura de vizinhança 2-opt* FirstFit.
 bool EvrpSolution::twoOptStarFirst()
 {
     vector<int> route1, route2;
     vector<int> temp1, temp2;
 
+    for (int i = 0; i < _routes.size(); i++) {
+        tuple<bool, vector<int>, double> returnTuple;
+        returnTuple = twoOptFirst(i);
+        if (get<0>(returnTuple)) {
+            _routes[i] = get<1>(returnTuple);
+            return true;
+        }
+    }
+
     for (int idxRoute1 = 0; idxRoute1 < _routes.size() - 1; idxRoute1++){
         route1 = _routes[idxRoute1];
         for (int idxRoute2 = idxRoute1 + 1; idxRoute2 < _routes.size(); idxRoute2++){
             route2 = _routes[idxRoute2];
+            
+            double oldEnergy = _evrpData->requiredEnergyOneRoute(_routes[idxRoute1]);
+            oldEnergy += _evrpData->requiredEnergyOneRoute(_routes[idxRoute2]);
+
             for (int i = 1; i < route1.size(); i++)
             {
                 for (int j = 1; j < route2.size(); j++)
@@ -311,19 +328,21 @@ bool EvrpSolution::twoOptStarFirst()
                     }
                     temp1 = routeModified1;
                     temp2 = routeModified2;
-                }
 
-                double newEnergy = _evrpData->requiredEnergyOneRoute(temp1);
-                newEnergy += _evrpData->requiredEnergyOneRoute(temp2);
+                    double newEnergy = _evrpData->requiredEnergyOneRoute(temp1);
+                    newEnergy += _evrpData->requiredEnergyOneRoute(temp2);
 
-                double oldEnergy = _evrpData->requiredEnergyOneRoute(_routes[idxRoute1]);
-                oldEnergy += _evrpData->requiredEnergyOneRoute(_routes[idxRoute2]);
-
-                if (newEnergy < oldEnergy)
-                {
-                    _routes[idxRoute1] = temp1;
-                    _routes[idxRoute2] = temp2;
-                    return true;
+                    
+                    if (newEnergy < oldEnergy)
+                    {
+                        bool demandOK = _evrpData->requiredDemand(temp1) && _evrpData->requiredDemand(temp2);
+                        if (demandOK)
+                        {
+                            _routes[idxRoute1] = temp1;
+                            _routes[idxRoute2] = temp2;
+                            return true;
+                        }
+                    }
                 }
             }
         }
@@ -339,4 +358,87 @@ double EvrpSolution::requiredEnergySolution(){
         totalEnergy += _evrpData->requiredEnergyOneRoute(tempRoute);
     }
     return totalEnergy;
+}
+
+// Estrutura de vizinhança 2-opt* BestFit.
+bool EvrpSolution::twoOptStarBest()
+{
+    vector<int> route1, route2;
+    vector<int> temp1, temp2, best1, best2;
+    bool bestFound = false;
+    double bestEconomy = 0;
+    int bestIdx1, bestIdx2;
+
+
+    for (int i = 0; i < _routes.size(); i++) {
+        tuple<bool, vector<int>, double> returnTuple;
+        returnTuple = twoOptBest(i);
+        if (get<0>(returnTuple)) {
+            _routes[i] = get<1>(returnTuple);
+            return true;
+        }
+    }
+
+    for (int idxRoute1 = 0; idxRoute1 < _routes.size() - 1; idxRoute1++){
+        route1 = _routes[idxRoute1];
+        for (int idxRoute2 = idxRoute1 + 1; idxRoute2 < _routes.size(); idxRoute2++){
+            route2 = _routes[idxRoute2];
+            
+            double oldEnergy = _evrpData->requiredEnergyOneRoute(_routes[idxRoute1]);
+            oldEnergy += _evrpData->requiredEnergyOneRoute(_routes[idxRoute2]);
+
+            for (int i = 1; i < route1.size(); i++)
+            {
+                for (int j = 1; j < route2.size(); j++)
+                {
+                    vector<int> routeModified1, routeModified2;
+                    for (int k = 0; k < i; k++)
+                    {
+                    routeModified1.push_back(route1[k]);
+                    }
+                    for (int k = j; k < route2.size(); k++)
+                    {
+                    routeModified1.push_back(route2[k]);
+                    }
+                    
+                    for (int k = 0; k < j; k++)
+                    {
+                    routeModified2.push_back(route2[k]);
+                    }
+                    for (int k = i; k < route1.size(); k++)
+                    {
+                    routeModified2.push_back(route1[k]);
+                    }
+                    temp1 = routeModified1;
+                    temp2 = routeModified2;
+
+                    double newEnergy = _evrpData->requiredEnergyOneRoute(temp1);
+                    newEnergy += _evrpData->requiredEnergyOneRoute(temp2);
+
+                    if (newEnergy < oldEnergy)
+                    {
+                        bool demandOK = _evrpData->requiredDemand(temp1) && _evrpData->requiredDemand(temp2);
+                        if (demandOK)
+                        {
+                            if ((oldEnergy - newEnergy) > bestEconomy) {
+                                best1 = temp1;
+                                best2 = temp2;
+                                bestIdx1 = idxRoute1;
+                                bestIdx2 = idxRoute2;
+                                bestFound = true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    if (bestFound)
+    {
+    _routes[bestIdx1] = best1;
+    _routes[bestIdx2] = best2;
+    return true;        
+    }
+    return false;
 }
