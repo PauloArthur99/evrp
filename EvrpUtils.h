@@ -304,7 +304,7 @@ void writeSolution(vector<vector<int>> routes, vector<double> routesEnergy, stri
     MyFile << "Tempo utilizado pelo hill climbing 2-opt: " << duration2opt << "\n";
 }
 
-vector<int> joinTwoRoutes(vector<int> vectA, int elemA, vector<int> vectB, int elemB)
+vector<int> joinTwoRoutesSavings(vector<int> vectA, int elemA, vector<int> vectB, int elemB)
 {
     bool firstA, firstB;
     if (vectA[0] == elemA)
@@ -401,6 +401,14 @@ struct saving
 bool operator< (const saving sav1, const saving sav2)
 {
 	return sav1.saving < sav2.saving;	
+}
+
+vector<int> joinTwoRoutes(vector<int> vectA, vector<int> vectB)
+{
+    vector<int> v;
+    v.insert(v.end(), vectA.begin(), vectA.end());
+    v.insert(v.end(), vectB.begin(), vectB.end());
+    return v;
 }
 
 /*

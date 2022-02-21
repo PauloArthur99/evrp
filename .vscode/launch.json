@@ -8,7 +8,7 @@
       "request": "launch",
       "program": "${workspaceFolder}/evrp",
       "args": [],
-      "stopAtEntry": true,
+      "stopAtEntry": false,
       "cwd": "${fileDirname}",
       "environment": [],
       "externalConsole": false,

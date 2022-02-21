@@ -14,6 +14,7 @@ public:
     double requiredEnergySolution();
     bool twoOptStarFirst();
     bool twoOptStarBest();
+    bool joinRoutesSolution();
 
     EvrpData* _evrpData;
     vector<vector<int>> _routes;
@@ -107,9 +108,9 @@ void EvrpSolution::savingsAlg() {
                     double spentEnergyReverse = requiredEnergy(distMatrix, energyMatrix, 
                     demands, _routes[idxB], _routes[idxA], demandSum, pointB, pointA);
 
-                    if (spentEnergy <= 18000 && spentEnergyReverse <= 18000)
+                    if (spentEnergy <= ENERGY_BATTERY && spentEnergyReverse <= ENERGY_BATTERY)
                     {
-                        vector<int> routesJoined = joinTwoRoutes(_routes[idxA], pointA, _routes[idxB], pointB);
+                        vector<int> routesJoined = joinTwoRoutesSavings(_routes[idxA], pointA, _routes[idxB], pointB);
                         _routes.push_back(routesJoined);
 
                         if (idxA < idxB)
@@ -133,7 +134,15 @@ void EvrpSolution::savingsAlg() {
 void EvrpSolution::insertDepoAndEnergies() {
     vector<double> demands = _evrpData->demands();
     vector<vector<double>> distMatrix = _evrpData->distMatrix();
+    vector<vector<double>> distMatrixStations = _evrpData->distMatrixStations();
     vector<vector<double>> energyMatrix = _evrpData->energyMatrix();
+    vector<vector<double>> energyMatrixStations = _evrpData->energyMatrixStations();
+    int stationsSize = _evrpData->pointsStationsSize();
+
+    for (int i = 0; i < stationsSize; i++) {
+        energyMatrix.push_back(energyMatrixStations[i]);
+        distMatrix.push_back(distMatrixStations[i]);
+    }
 
     for (int i = 0; i < _routes.size(); i++)
     {
@@ -439,6 +448,60 @@ bool EvrpSolution::twoOptStarBest()
     _routes[bestIdx1] = best1;
     _routes[bestIdx2] = best2;
     return true;        
+    }
+    return false;
+}
+
+bool EvrpSolution::joinRoutesSolution()
+{
+    vector<int> route1, route2;
+    vector<vector<double>> energyMatrix = _evrpData->energyMatrix();
+    vector<vector<double>> energyMatrixStations = _evrpData->energyMatrixStations();
+    /*
+    for (int i = 0; i < _evrpData->pointsStationsSize(); i++) {
+        energyMatrix.push_back(energyMatrixStations[i]);
+    }
+    */
+    for (int idxRoute1 = 0; idxRoute1 < _routes.size() - 1; idxRoute1++) {
+        route1 = _routes[idxRoute1];
+
+        for (int idxRoute2 = idxRoute1 + 1; idxRoute2 < _routes.size(); idxRoute2++) {
+            route2 = _routes[idxRoute2];
+            vector<int> tempRoute = joinTwoRoutes(route1, route2);
+            bool demandOK = _evrpData->requiredDemand(tempRoute);
+
+            if (demandOK) {
+                for (int idxStation = 0; idxStation < stationsSize; idxStation++) {
+                    double newEnergyRoute1 = _evrpData->requiredEnergyJoined(route1, route2, idxStation);
+
+                    if (newEnergyRoute1 <= ENERGY_BATTERY) {
+                        int first2 = route2[0];
+                        double distDepoFirst = energyMatrix[0][first2];
+                        double stationDistance2 = energyMatrixStations[idxStation][first2];
+
+                        if (stationDistance2 <= distDepoFirst){
+                            route1.push_back(idxStation + _evrpData->pointsSize());
+                            vector<int> newRoute = joinTwoRoutes(route1, route2);
+                            _routes.push_back(newRoute);
+                            _routes.erase(_routes.begin() + idxRoute1);
+                            _routes.erase(_routes.begin() + idxRoute2 - 1);
+                            return true;
+                        } else {
+                            double newEnergyRoute2 = _evrpData->requiredEnergyRouteStations(route2) 
+                                                    - distDepoFirst + stationDistance2;
+                            if (newEnergyRoute2 <= ENERGY_BATTERY) {
+                                route1.push_back(idxStation + _evrpData->pointsSize());
+                                vector<int> newRoute = joinTwoRoutes(route1, route2);
+                                _routes.push_back(newRoute);
+                                _routes.erase(_routes.begin() + idxRoute1);
+                                _routes.erase(_routes.begin() + idxRoute2 - 1);
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
     return false;
 }

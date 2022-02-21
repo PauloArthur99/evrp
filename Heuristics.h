@@ -28,3 +28,11 @@ void hillClimbingSolution(EvrpSolution* evrpSolution, int neighborhood){
     }
     
 }
+
+void joinRoutes(EvrpSolution* evrpSolution){
+    bool ok = true;
+    while (ok)
+    {
+        ok = evrpSolution->joinRoutesSolution();
+    }
+}
