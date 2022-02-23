@@ -5,16 +5,15 @@ using namespace std;
 
 int main(int argc, char** argv){
 
-    string argvv = "instance29.txt";
-    EvrpData evrpDataobj = EvrpData(argvv);
+    EvrpData evrpDataobj = EvrpData(argv[1]);
     EvrpSolution evrpSolution = EvrpSolution(&evrpDataobj);
     evrpSolution.savingsAlg();
     hillClimbingSolution(&evrpSolution, 0);
     joinRoutes(&evrpSolution);
-    
+
     evrpSolution.insertDepoAndEnergies();
     string strSolucao = "/Users/paulo/Desktop/evrp/evrptw_instances/soluções/solução";
-    strSolucao = strSolucao + argvv;
+    strSolucao = strSolucao + argv[1];
 
     writeSolutionSavings(evrpSolution.routes(), evrpSolution.routesEnergy(), strSolucao);
 

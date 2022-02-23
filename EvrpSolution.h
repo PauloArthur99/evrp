@@ -471,7 +471,7 @@ bool EvrpSolution::joinRoutesSolution()
             bool demandOK = _evrpData->requiredDemand(tempRoute);
 
             if (demandOK) {
-                for (int idxStation = 0; idxStation < stationsSize; idxStation++) {
+                for (int idxStation = 0; idxStation < _evrpData->pointsStationsSize(); idxStation++) {
                     double newEnergyRoute1 = _evrpData->requiredEnergyJoined(route1, route2, idxStation);
 
                     if (newEnergyRoute1 <= ENERGY_BATTERY) {
