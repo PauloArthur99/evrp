@@ -15,6 +15,7 @@ public:
     bool requiredDemand(vector<int> route);
     double requiredEnergyJoined(vector<int> route1, vector<int> route2, int idxStation);
     double requiredEnergyRouteStations(vector<int> route);
+    double requiredTotalEnergyRouteStations(vector<int> route);
 
     int _lastPoint;
 	vector<pair<double, double>> _points, _pointsStations;
@@ -210,6 +211,10 @@ double EvrpData::requiredEnergyJoined(vector<int> route1, vector<int> route2, in
     {
         int orig = route1[i];
         int dest = route1[i+1];
+        if (orig >= pointsSize())
+        {
+            routeEnergy = 0;
+        }
         routeEnergy += energyMatrix[orig][dest];
         routeEnergy += distMatrix[orig][dest] * demandSum * ENERGY_CONST_LOAD;
         demandSum -= _demands[dest];
@@ -238,8 +243,46 @@ double EvrpData::requiredEnergyRouteStations(vector<int> route) {
     }
 
     int dest = route[0];
-    routeEnergy += _energyMatrix[0][dest];
-    routeEnergy += _distMatrix[0][dest] * demandSum * ENERGY_CONST_LOAD;
+    routeEnergy += energyMatrix[0][dest];
+    routeEnergy += distMatrix[0][dest] * demandSum * ENERGY_CONST_LOAD;
+    demandSum -= _demands[dest];
+    for (int i = 0; i < route.size() - 1; i++)
+    {
+        int orig = route[i];
+        int dest = route[i+1];
+        if (orig >= pointsSize())
+        {
+            routeEnergy = 0;
+        }
+        routeEnergy += energyMatrix[orig][dest];
+        routeEnergy += distMatrix[orig][dest] * demandSum * ENERGY_CONST_LOAD;
+        demandSum -= _demands[dest];
+    }
+    int idx = route.size() - 1;
+    int orig = route[idx];
+    routeEnergy += energyMatrix[orig][0];
+    return routeEnergy;
+}
+
+double EvrpData::requiredTotalEnergyRouteStations(vector<int> route) {
+    vector<vector<double>> energyMatrix = _energyMatrix;
+    vector<vector<double>> distMatrix = _distMatrix;
+    for (int i = 0; i < pointsStationsSize(); i++) {
+        energyMatrix.push_back(_energyMatrixStations[i]);
+        distMatrix.push_back(_distMatrixStations[i]);
+    }
+
+    double routeEnergy = 0;
+    double demandSum = 0;
+    for (int i = 0; i < route.size(); i++)
+    {
+        int elem = route[i];
+        demandSum += _demands[elem];
+    }
+
+    int dest = route[0];
+    routeEnergy += energyMatrix[0][dest];
+    routeEnergy += distMatrix[0][dest] * demandSum * ENERGY_CONST_LOAD;
     demandSum -= _demands[dest];
     for (int i = 0; i < route.size() - 1; i++)
     {
@@ -251,6 +294,6 @@ double EvrpData::requiredEnergyRouteStations(vector<int> route) {
     }
     int idx = route.size() - 1;
     int orig = route[idx];
-    routeEnergy += _energyMatrix[orig][0];
+    routeEnergy += energyMatrix[orig][0];
     return routeEnergy;
 }

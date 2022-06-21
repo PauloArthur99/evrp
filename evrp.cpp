@@ -10,11 +10,11 @@ int main(int argc, char** argv){
     evrpSolution.savingsAlg();
     hillClimbingSolution(&evrpSolution, 0);
     joinRoutes(&evrpSolution);
+    hillClimbingEachRoute(&evrpSolution, 2);
 
     evrpSolution.insertDepoAndEnergies();
     string strSolucao = "/Users/paulo/Desktop/evrp/evrptw_instances/soluções/solução";
     strSolucao = strSolucao + argv[1];
-
     writeSolutionSavings(evrpSolution.routes(), evrpSolution.routesEnergy(), strSolucao);
 
 	return 0;
