@@ -368,7 +368,7 @@ bool depositConect(vector<int> route, int point)
 }
 
 // escreve as rotas encontradas em um arquivo
-void writeSolutionSavings(vector<vector<int>> routes, vector<double> routesEnergy, string fileName)
+void writeSolutionSavings(vector<vector<int>> routes, vector<double> routesEnergy, string fileName, double savings_time, double two_opt_time)
 {
     ofstream MyFile(fileName); 
     MyFile << "RouteID    RoutePoints           Energy\n";
@@ -389,6 +389,8 @@ void writeSolutionSavings(vector<vector<int>> routes, vector<double> routesEnerg
         }
         MyFile << "    " << routesEnergy[i] << "\n";
     }
+    MyFile << "Tempo utilizado pelo algoritmo de economias: " << savings_time << "\n";
+    MyFile << "Tempo utilizado pelo hill climbing 2-opt: " << two_opt_time << "\n";
 }
 
 // Struct utilizada para descrever as economias

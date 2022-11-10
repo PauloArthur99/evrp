@@ -1,3 +1,5 @@
 RouteID    RoutePoints           Energy
-R1         0 14 5 8 15 12 0     7447.41
+R1         0 12 15 8 5 14 0     7789.82
 R2         0 10 4 3 9 13 11 6 1 7 2 0     15779.3
+Tempo utilizado pelo algoritmo de economias: 0
+Tempo utilizado pelo hill climbing 2-opt: 0

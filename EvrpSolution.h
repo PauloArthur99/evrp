@@ -524,23 +524,23 @@ tuple<bool, vector<int>, double> EvrpSolution::twoOptFirstWithStations(int idxRo
             vector<int> auxVector;
             for (int k = 0; k < i; k++)
             {
-            routeModified.push_back(route[k]);
+                routeModified.push_back(route[k]);
             }
 
             for (int k = i; k <= j; k++)
             {
-            auxVector.push_back(route[k]);
+                auxVector.push_back(route[k]);
             }
             reverse(auxVector.begin(), auxVector.end());
 
             for (int k = 0; k < auxVector.size(); k++)
             {
-            routeModified.push_back(auxVector[k]);
+                routeModified.push_back(auxVector[k]);
             }
 
             for (int k = j+1; k < route.size(); k++)
             {
-            routeModified.push_back(route[k]);
+                routeModified.push_back(route[k]);
             }
             tempRoute = routeModified; 
         }
