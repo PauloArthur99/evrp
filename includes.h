@@ -7,9 +7,12 @@
 #include <cmath>
 #include <queue>
 #include <algorithm>
-#include<tuple>
+#include <tuple>
 #include <chrono>
 #include <limits>
+#include <random>       
+#include <cstdlib>
+#include <time.h>
 #define ENERGY_CONST_LOAD 0.129285172
 #define ENERGY_CONST 86.20810869
 #define ENERGY_BATTERY 18000

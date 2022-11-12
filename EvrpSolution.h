@@ -2,6 +2,7 @@ using namespace std;
 class EvrpSolution {
 public:
     void set_route(int i, vector<int> new_route);
+    void set_routes(vector<vector<int>> new_routes);
     vector<vector<int>> routes();
     int routes_size();
     vector<double> routesEnergy();
@@ -16,11 +17,27 @@ public:
     bool twoOptStarFirst();
     bool twoOptStarBest();
     bool joinRoutesSolution();
+    void shuffle();
+
 
     EvrpData* _evrpData;
     vector<vector<int>> _routes;
     vector<double> _routesEnergy;
 };
+
+int EvrpSolution::routes_size(){
+    return _routes.size();
+}
+
+void EvrpSolution::shuffle() {
+    // obtain a time-based seed:
+    unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+    std::default_random_engine e(seed);
+
+    srand(time(0));
+    int rand_idx = rand() % routes_size();
+    std::shuffle(_routes[rand_idx].begin(), _routes[rand_idx].end(), e);
+}
 
 vector<vector<int>> EvrpSolution::routes() {
     return _routes;
@@ -28,6 +45,10 @@ vector<vector<int>> EvrpSolution::routes() {
 
 void EvrpSolution::set_route(int i, vector<int> new_route) {
     _routes[i] =  new_route;
+}
+
+void EvrpSolution::set_routes(vector<vector<int>> new_routes) {
+    _routes =  new_routes;
 }
 
 vector<double> EvrpSolution::routesEnergy() {
@@ -288,10 +309,6 @@ tuple<bool, vector<int>, double> EvrpSolution::get_neighbor(int idxRoute, int ne
     } else {
         return twoOptFirstWithStations(idxRoute);
     }
-}
-
-int EvrpSolution::routes_size(){
-    return _routes.size();
 }
 
 // Estrutura de vizinhança 2-opt* FirstFit.

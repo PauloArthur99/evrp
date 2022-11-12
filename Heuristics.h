@@ -36,3 +36,26 @@ void joinRoutes(EvrpSolution* evrpSolution){
         ok = evrpSolution->joinRoutesSolution();
     }
 }
+
+void pertubation(EvrpSolution* evrpSolution, EvrpSolution* evrpSolutionCopy){
+    evrpSolutionCopy->set_routes(evrpSolution->routes());
+    int iter_counter = 0;
+    while (true)
+    {
+        evrpSolutionCopy->shuffle();
+        hillClimbingSolution(evrpSolutionCopy, 0);
+
+        if (evrpSolutionCopy->requiredEnergySolution() < evrpSolution->requiredEnergySolution()) {
+            evrpSolution->set_routes(evrpSolutionCopy->routes());
+            iter_counter = 0;
+            //cout << "melhorando\n";
+        } else {
+            evrpSolutionCopy->set_routes(evrpSolution->routes());
+            iter_counter++;
+        }
+        if (iter_counter == 100){
+            break;
+        }
+    }
+    
+}

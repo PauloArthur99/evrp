@@ -1,7 +1,6 @@
 #include "EvrpData.h"
 #include "EvrpSolution.h"
 #include "Heuristics.h"
-#include <chrono>
 using namespace std::chrono;
 using namespace std;
 
@@ -14,7 +13,8 @@ int main(int argc, char** argv){
 
     hillClimbingSolution(&evrpSolution, 0);
 
-    pertubation(&evrpSolution);
+    EvrpSolution evrpSolutionCopy = EvrpSolution(&evrpDataobj);
+    pertubation(&evrpSolution, &evrpSolutionCopy);
 
     joinRoutes(&evrpSolution);
     hillClimbingEachRoute(&evrpSolution, 2);
