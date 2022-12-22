@@ -48,9 +48,6 @@ EvrpData::EvrpData(string instance) {
             string pointDemand;
             ss >> pointDemand; 
             _demands.push_back(stod(pointDemand));
-            if (type == "d") {
-                _pointsStations.push_back(pointPair);
-            }
         }
         else if (type == "f")
         {
@@ -83,7 +80,7 @@ EvrpData::EvrpData(string instance) {
     {
         for (int j = 0; j < sizePoints; j++)
         {
-            _distMatrix[i][j] = distancePoints(_points[i], _points[j]);
+            _distMatrix[i][j] = distancePoints(_points[i], _points[j]) * km_to_meter;
             _energyMatrix[i][j] = ENERGY_CONST * _distMatrix[i][j];
         }
     }
@@ -93,7 +90,7 @@ EvrpData::EvrpData(string instance) {
     {
         for (int j = 0; j < sizePoints; j++)
         {
-            _distMatrixStations[i][j] = distancePoints(_pointsStations[i], _points[j]);
+            _distMatrixStations[i][j] = distancePoints(_pointsStations[i], _points[j]) * km_to_meter;
             _energyMatrixStations[i][j] = ENERGY_CONST * _distMatrixStations[i][j];
         }
     }

@@ -1,0 +1,4 @@
+RouteID    RoutePoints           Energy
+R1         0 4 2 3 5 6 1 0     71087.7
+Tempo utilizado pelo programa em milissegundos: 6
+Número de veículos: 1

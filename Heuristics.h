@@ -44,11 +44,11 @@ void pertubation(EvrpSolution* evrpSolution, EvrpSolution* evrpSolutionCopy){
     {
         evrpSolutionCopy->shuffle();
         hillClimbingSolution(evrpSolutionCopy, 0);
+        
 
-        if (evrpSolutionCopy->requiredEnergySolution() < evrpSolution->requiredEnergySolution()) {
+        if (evrpSolutionCopy->requiredEnergySolution() < evrpSolution->requiredEnergySolution() && evrpSolution->feasibleRoutes()) {
             evrpSolution->set_routes(evrpSolutionCopy->routes());
             iter_counter = 0;
-            //cout << "melhorando\n";
         } else {
             evrpSolutionCopy->set_routes(evrpSolution->routes());
             iter_counter++;

@@ -18,6 +18,7 @@ public:
     bool twoOptStarBest();
     bool joinRoutesSolution();
     void shuffle();
+    bool feasibleRoutes();
 
 
     EvrpData* _evrpData;
@@ -390,6 +391,18 @@ double EvrpSolution::requiredEnergySolution(){
     return totalEnergy;
 }
 
+bool EvrpSolution::feasibleRoutes(){
+    vector<int> tempRoute;
+    for (int i = 0; i < _routes.size(); i++){
+        tempRoute = _routes[i];
+        double temp_energy = _evrpData->requiredEnergyOneRoute(tempRoute);
+        if (temp_energy > ENERGY_BATTERY) {
+            return false;
+        }
+    }
+    return true;
+}
+
 // Estrutura de vizinhança 2-opt* BestFit.
 bool EvrpSolution::twoOptStarBest()
 {
@@ -478,6 +491,9 @@ bool EvrpSolution::joinRoutesSolution()
     vector<int> route1, route2;
     vector<vector<double>> energyMatrix = _evrpData->energyMatrix();
     vector<vector<double>> energyMatrixStations = _evrpData->energyMatrixStations();
+    vector<vector<double>> distMatrix = _evrpData->distMatrix();
+    vector<vector<double>> distMatrixStations = _evrpData->distMatrixStations();
+    vector<double> demands = _evrpData->demands();
     /*
     for (int i = 0; i < _evrpData->pointsStationsSize(); i++) {
         energyMatrix.push_back(energyMatrixStations[i]);
@@ -508,8 +524,18 @@ bool EvrpSolution::joinRoutesSolution()
                             _routes.erase(_routes.begin() + idxRoute2 - 1);
                             return true;
                         } else {
+                            double demandSum = 0;
+                            for (int i = 0; i < route2.size(); i++)
+                            {
+                                int elem = route2[i];
+                                demandSum += demands[elem];
+                            }
                             double newEnergyRoute2 = _evrpData->requiredEnergyRouteStations(route2) 
-                                                    - distDepoFirst + stationDistance2;
+                                - distDepoFirst 
+                                - (distMatrix[0][first2] * demandSum * ENERGY_CONST_LOAD) 
+                                + (distMatrixStations[idxStation][first2] * demandSum * ENERGY_CONST_LOAD)
+                                + stationDistance2;
+
                             if (newEnergyRoute2 <= ENERGY_BATTERY) {
                                 route1.push_back(idxStation + _evrpData->pointsSize());
                                 vector<int> newRoute = joinTwoRoutes(route1, route2);
